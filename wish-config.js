@@ -1,6 +1,2 @@
-// CHỈ điền URL dự án và Publishable key (sb_publishable_...)
-// KHÔNG dán Secret key hoặc service_role key vào file công khai.
-window.WISH_CONFIG = {
-  supabaseUrl: 'https://grdytkyfzvranodyxagn.supabase.co',
-  publishableKey: 'sb_publishable_Mhumf7W_VhkhHNCPSXyKSg_Cp8WG6E4'
-};
+// URL Web app của Apps Script; không đưa khóa hoặc quyền Google vào trang thiệp.
+window.WISH_CONFIG = { endpoint: 'https://script.google.com/macros/s/AKfycbxSYvDfq_dBauR2R7uWxsVef5xxkbOxXgJOOWfn3wSTARRxLCNVWauFq_8ds9IQYkwk/exec' };
