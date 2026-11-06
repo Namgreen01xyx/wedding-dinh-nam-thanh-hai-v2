@@ -123,8 +123,12 @@
     @media(max-width:380px){:root{--heading-size:40px}.wish-panel-top h3{font-size:23px}}
 
     .gift-account .gift-account-bank{display:flex;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:400;letter-spacing:0;color:var(--muted);line-height:1.6}.gift-account-bank .gift-bank-logo{width:62px;height:24px;object-fit:contain;mix-blend-mode:multiply}
+    .gift-account-bank .gift-bank-logo[alt="VietinBank"]{width:96px}
     .gift-account .gift-account-number{font-size:14px;line-height:1.7;font-weight:400;letter-spacing:.02em;color:var(--forest);margin:3px 0}
     .gift-account .gift-account-holder{font-size:12px;letter-spacing:.02em;font-weight:400;color:var(--muted);margin:3px 0}
+    .gift-content{display:grid;gap:20px}.gift-account{min-width:0;background:#fffdf9;border:1px solid var(--line);border-radius:12px;padding:24px 16px}.gift-account+.gift-account{margin-top:0;border-top:1px solid var(--line);padding-top:24px}.gift-account .gift-account-bank{min-height:24px}.gift-account .btn{display:flex;width:100%;margin:12px 0 0}.gift-account h3{font-size:26px}
+    @media(min-width:900px){.gift-layout:has(.gift-envelope[open]){max-width:1050px;grid-template-columns:1fr;gap:32px}.gift-layout:has(.gift-envelope[open]) .gift-copy{text-align:center}.gift-layout:has(.gift-envelope[open]) .gift-copy h2,.gift-layout:has(.gift-envelope[open]) .gift-copy p{margin-inline:auto}.gift-envelope[open]{width:100%;max-width:800px;margin:auto}.gift-envelope[open] .gift-content{grid-template-columns:repeat(2,minmax(0,1fr));padding:24px 12px 12px}}
+
 
     .music-btn[aria-pressed="true"]{background:var(--forest);color:var(--cream);border-color:var(--forest)}
     body:has(.music-btn:not([hidden])) .hero-chip{right:78px}
@@ -157,6 +161,11 @@
     .public-wishes{max-width:760px;margin-top:36px}.public-wishes .wishes-panel{margin-top:0}.rsvp-layout{grid-template-columns:1fr;max-width:760px;align-items:start;gap:28px}.rsvp-layout .section-head{text-align:center;margin:0 auto}.rsvp-layout .section-head p{margin-inline:auto}
     @media(min-width:701px){.event-choices{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media(max-width:700px){.choice-field legend,.event-choices label,.publish-choice{font-size:13px}.field-hint,.event-choices small,.publish-choice small{font-size:12px}.public-wishes{margin-top:28px}.rsvp-card{padding:22px}}
+    .overlay{transition:opacity .85s ease,backdrop-filter .85s ease}.envelope{transition:transform .85s cubic-bezier(.22,.61,.36,1),opacity .65s ease;transform-origin:center}.overlay.is-opening{opacity:0;backdrop-filter:blur(0)}.overlay.is-opening .envelope{transform:scale(1.12) translateY(-18px);opacity:0}.invitation-opened .hero-inner{animation:invitationWelcome 1s ease both}@keyframes invitationWelcome{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .wishes-panel .wish-list{max-height:500px;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch}.wish-scroll-hint{text-align:center;font-size:11px;color:var(--muted);margin:12px 0 0}.wishes-panel .wish-list::-webkit-scrollbar{width:6px}.wishes-panel .wish-list::-webkit-scrollbar-track{background:#f0f4ee;border-radius:6px}.wishes-panel .wish-list::-webkit-scrollbar-thumb{background:#9aac9c;border-radius:6px}
+    @media(max-width:700px){.wishes-panel .wish-list{max-height:min(480px,58svh)}}
+    .rsvp-section{padding-bottom:32px}.gift-section{padding-top:32px}
+    @media(max-width:700px){.rsvp-section{padding-bottom:24px}.gift-section{padding-top:24px}}
   </style>
 </head>
 <body class="no-scroll">
@@ -203,6 +212,7 @@
       <section class="wishes-panel reveal" id="wishes" aria-labelledby="wishPanelTitle">
         <div class="wish-panel-top"><div><h3 id="wishPanelTitle">Những lời chúc yêu thương</h3></div><button aria-label="Tải lại lời chúc" class="wish-refresh" id="reloadWishes" title="Tải lời chúc mới" type="button">↻</button></div>
         <div aria-label="Danh sách lời chúc, cuộn để xem thêm" class="wish-list" id="wishList" tabindex="0"></div>
+        <p class="wish-scroll-hint" id="wishScrollHint" hidden>Cuộn để xem thêm những lời chúc ♡</p>
         <p aria-live="polite" class="wishes-status" id="wishStatus" role="status"></p>
       </section>
     </div>
@@ -269,7 +279,21 @@
   if($('giftContent').querySelector('.gift-account'))$('giftContent').querySelector('.gift-pending').remove();
   const params=new URLSearchParams(location.search);let guest=(params.get('to')||'').trim().slice(0,80);
   if(guest){$('guestGreeting').textContent=guest;$('rsvpName').value=guest;}
-  $('openInvite').addEventListener('click',()=>{$('invitation').remove();document.body.classList.remove('no-scroll');window.scrollTo({top:0});document.querySelector('.nav a').focus({preventScroll:true});music.play().catch(()=>toast('Bạn bấm nút nốt nhạc để bật nhạc nhé.'));});
+  $('openInvite').addEventListener('click',()=>{
+    const cover=$('invitation');
+    $('openInvite').disabled=true;
+    music.play().catch(()=>toast('Bạn bấm nút nốt nhạc để bật nhạc nhé.'));
+    window.scrollTo({top:0,behavior:'instant'});
+    cover.classList.add('is-opening');document.body.classList.add('invitation-opened');
+    let finished=false;
+    function finishOpening(){
+      if(finished)return;finished=true;
+      cover.remove();document.body.classList.remove('no-scroll');
+      document.querySelector('.nav a').focus({preventScroll:true});
+    }
+    cover.addEventListener('transitionend',event=>{if(event.target===cover&&event.propertyName==='opacity')finishOpening()});
+    setTimeout(finishOpening,window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:950);
+  });
   function updateClock(){let delta=weddingDate.getTime()-Date.now();if(!Number.isFinite(delta)){return}delta=Math.max(0,delta);const day=Math.floor(delta/86400000);const hour=Math.floor(delta/3600000)%24;const minute=Math.floor(delta/60000)%60;const second=Math.floor(delta/1000)%60;for(const [id,n] of [['days',day],['hours',hour],['minutes',minute],['seconds',second]])$(id).textContent=String(n).padStart(2,'0');if(delta===0)document.querySelector('#schedule .section-head p').textContent='Ngày hạnh phúc của chúng mình đã đến!';}updateClock();setInterval(updateClock,1000);
   const gallery=$('galleryGrid');CONFIG.galleryImages.forEach((url,i)=>{const b=document.createElement('button');b.type='button';b.className='gallery-item reveal';b.setAttribute('aria-label',`Xem ảnh cưới ${i+1}`);const img=document.createElement('img');img.src=url;img.alt=`Ảnh cưới kỷ niệm ${i+1}`;img.loading='lazy';b.append(img);b.addEventListener('click',()=>openLightbox(i));gallery.append(b)});
   let lightIndex=0;function openLightbox(i){lightIndex=(i+CONFIG.galleryImages.length)%CONFIG.galleryImages.length;$('lightboxImg').src=CONFIG.galleryImages[lightIndex];$('lightbox').classList.add('open');document.body.classList.add('no-scroll')};function closeLightbox(){$('lightbox').classList.remove('open');document.body.classList.remove('no-scroll')};$('lightboxClose').onclick=closeLightbox;$('lightboxPrev').onclick=()=>openLightbox(lightIndex-1);$('lightboxNext').onclick=()=>openLightbox(lightIndex+1);$('lightbox').addEventListener('click',e=>{if(e.target===$('lightbox'))closeLightbox()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('lightbox').classList.contains('open'))closeLightbox();if(e.key==='ArrowRight'&&$('lightbox').classList.contains('open'))openLightbox(lightIndex+1);if(e.key==='ArrowLeft'&&$('lightbox').classList.contains('open'))openLightbox(lightIndex-1)});
@@ -450,9 +474,12 @@
     try{
       const result=await sheetRequest();
       if(!Array.isArray(result.wishes))throw Error('Dữ liệu không hợp lệ.');
-      showWishes(result.wishes);setWishStatus('');
+      showWishes(result.wishes);setWishStatus('');requestAnimationFrame(updateWishScrollHint);
     }catch{setWishStatus('Chưa tải được lời chúc. Bạn có thể bấm tải lại sau nhé.')}
   }
+  function updateWishScrollHint(){const list=$('wishList');$('wishScrollHint').hidden=list.scrollHeight<=list.clientHeight+1}
+  if('ResizeObserver'in window)new ResizeObserver(updateWishScrollHint).observe($('wishList'));
+  window.addEventListener('resize',updateWishScrollHint);
   $('reloadWishes').addEventListener('click',loadWishes);
   loadWishes();
   $('addCalendar').addEventListener('click',()=>{const date=s=>s.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');const start=weddingDate;const end=new Date(start.getTime()+3*3600000);const title=`Đám cưới ${fullNames}`;const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Our Wedding//VI','BEGIN:VEVENT',`UID:wedding-${start.getTime()}@ourwedding.local`,`DTSTAMP:${date(new Date())}`,`DTSTART:${date(start)}`,`DTEND:${date(end)}`,`SUMMARY:${title}`,`DESCRIPTION:Thiệp cưới của ${fullNames}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download='lich-cuoi.ics';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)});
