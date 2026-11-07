@@ -260,7 +260,7 @@
   $('heroNames').innerHTML=`${esc(CONFIG.groom)}<br><em>&</em> ${esc(CONFIG.bride)}`;
   $('footerNames').innerHTML=`<span>${esc(CONFIG.groom)}</span><em>&</em><span>${esc(CONFIG.bride)}</span>`;
   $('storySignature').textContent=fullNames;
-  $('monogram').textContent=`${CONFIG.groom.trim().split(/\s+/).at(-1)[0]} & ${CONFIG.bride.trim().split(/\s+/).at(-1)[0]}`;
+  $('monogram').textContent=`${CONFIG.groom.trim().split(/\s+/).slice(-1)[0][0]} & ${CONFIG.bride.trim().split(/\s+/).slice(-1)[0][0]}`;
   const weddingDate=new Date(CONFIG.weddingDate);
   $('heroDate').textContent=Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Asia/Ho_Chi_Minh'}).format(weddingDate).replaceAll('/',' • ');
   document.querySelector('.hero-background').style.backgroundImage=`url("${CONFIG.heroImage.replaceAll('"','%22')}")`;
@@ -378,7 +378,7 @@
       let pending;
       try{pending=JSON.parse(sessionStorage.getItem('wedding_pending_submission')||'null')}catch{}
       if(!pending||pending.fingerprint!==fingerprint){
-        pending={fingerprint,id:rsvpState?.id||crypto.randomUUID(),token:rsvpState?.token||randomWishToken()};
+        pending={fingerprint,id:rsvpState?.id||randomWishToken(),token:rsvpState?.token||randomWishToken()};
         try{sessionStorage.setItem('wedding_pending_submission',JSON.stringify(pending))}catch{}
       }
       rsvpState={...rsvpState,data,id:pending.id,token:pending.token,saved:false};persistRsvp();
