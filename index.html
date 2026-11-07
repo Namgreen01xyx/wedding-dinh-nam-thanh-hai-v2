@@ -200,7 +200,7 @@
           <div class="field"><label for="guestCount">Số người tham dự *</label><input id="guestCount" type="number" min="1" max="10" step="1" required value="1" aria-describedby="guestCountHint"><p class="field-hint" id="guestCountHint">Tính cả bạn, áp dụng cho mỗi buổi đã chọn.</p></div>
         </fieldset>
         <div class="field"><label for="rsvpNote">Lời chúc / lời nhắn (không bắt buộc)</label><textarea id="rsvpNote" maxlength="300" placeholder="Gửi đôi lời tới chúng mình..."></textarea></div>
-        <label class="publish-choice"><input type="checkbox" id="publishWish"><span>Hiển thị lời chúc trên thiệp<small>Chỉ tên và lời chúc được công khai khi bạn chọn mục này.</small></span></label>
+        <label class="publish-choice"><input type="checkbox" id="publishWish" checked><span>Hiển thị lời chúc trên thiệp<small>Tên và lời chúc sẽ hiển thị trên thiệp. Bỏ chọn nếu bạn muốn gửi riêng.</small></span></label>
         <p class="note rsvp-storage-note">Thông tin được gửi đến cô dâu chú rể. Chỉ tên và lời chúc được hiển thị trên thiệp khi bạn đồng ý ở trên.</p>
         </fieldset>
         <button class="btn outline" type="button" id="editRsvp" hidden>Chỉnh sửa thông tin</button>
@@ -331,7 +331,7 @@
   function persistRsvp(){try{localStorage.setItem(rsvpStorageKey,JSON.stringify(rsvpState))}catch{}}
   function readRsvp(){
     const attending=document.querySelector('input[name="attending"]:checked').value==='yes';
-    return {name:$('rsvpName').value.trim(),attending:attending?'yes':'no',events:attending?eventOptions.filter(input=>input.checked).map(input=>input.value):[],guests:attending?Number($('guestCount').value):0,message:$('rsvpNote').value.trim(),publishWish:Boolean($('publishWish').checked&&$('rsvpNote').value.trim())};
+    return {name:$('rsvpName').value.trim(),attending:attending?'yes':'no',events:attending?eventOptions.filter(input=>input.checked).map(input=>input.value):[],guests:attending?Number($('guestCount').value):0,message:$('rsvpNote').value.trim(),publishWish:$('publishWish').checked};
   }
   function showRsvpSaved(saved){
     $('rsvpInputs').disabled=saved;
