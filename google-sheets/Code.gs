@@ -57,7 +57,7 @@ function doGet() {
     const sheet = table_();
     const rows = sheet.getLastRow() < 2 ? [] : sheet.getRange(2, 1, sheet.getLastRow() - 1, HEADERS.length).getValues();
     const wishes = rows.filter(r => r[9] === true && r[10] !== true && String(r[8]).trim())
-      .slice(-100).reverse().map(r => ({id: String(r[0]), name: String(r[2]), message: String(r[8]), created_at: new Date(r[1]).toISOString()}));
+      .reverse().map(r => ({id: String(r[0]), name: String(r[2]), message: String(r[8]), created_at: new Date(r[1]).toISOString()}));
     return json_({ok: true, wishes});
   } catch (_) { return json_({ok: false, error: 'Không tải được lời chúc.'}); }
 }
@@ -90,7 +90,7 @@ function doPost(e) {
     const events = data.events;
     if (!Array.isArray(events) || events.some(x => !['bride_party','groom_party','ceremony'].includes(x)) || new Set(events).size !== events.length) throw Error('Buổi tham dự không hợp lệ.');
     const attending = data.attending === 'yes';
-    if (attending ? (!events.length || !Number.isInteger(data.guests) || data.guests < 1 || data.guests > 10) : (events.length !== 0 || data.guests !== 0)) throw Error('Số người hoặc buổi tham dự không hợp lệ.');
+    if (attending ? (!events.length || !Number.isSafeInteger(data.guests) || data.guests < 1) : (events.length !== 0 || data.guests !== 0)) throw Error('Số người hoặc buổi tham dự không hợp lệ.');
     const row = [id, new Date(), literal_(name), attending ? 'Có' : 'Không', events.includes('bride_party'), events.includes('groom_party'), events.includes('ceremony'), data.guests, literal_(message), data.publishWish && !!message, false, tokenHash, 'Thiệp cưới'];
     if (data.action === 'save' && index >= 0) sheet.getRange(index + 2, 1, 1, HEADERS.length).setValues([row]);
     else sheet.appendRow(row);

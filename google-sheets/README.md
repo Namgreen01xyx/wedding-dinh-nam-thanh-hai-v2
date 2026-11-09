@@ -11,7 +11,7 @@ Giữ link Sheet và dự án Apps Script trong ghi chú riêng của chủ thi�
 
 ## Cách lưu
 Mỗi lượt gửi là một dòng trong Khách mời. Số người áp dụng cho từng buổi được đánh dấu. Tổng hợp cộng số người theo từng buổi, không cộng các buổi thành số khách duy nhất.
-Chỉ tên, lời chúc, thời gian, mã gửi của dòng cho phép công khai và chưa thu hồi được endpoint GET trả về (100 lời chúc mới nhất).
+Chỉ tên, lời chúc, thời gian, mã gửi của dòng cho phép công khai và chưa thu hồi được endpoint GET trả về (toàn bộ lời chúc đáp ứng điều kiện, mới nhất trước).
 POST dùng JSON trong Content-Type text/plain để tránh preflight; phải đọc được JSON ok:true mới thông báo gửi thành công. Không dùng no-cors để giả định đã lưu.
 Mã gửi và mã thu hồi được giữ trong phiên để thử lại an toàn khi mất phản hồi. Sau thành công, mã thu hồi được giữ trên trình duyệt đã gửi. Đổi thiết bị/xóa dữ liệu trình duyệt sẽ mất quyền thu hồi; dâu rể vẫn có thể sửa cột Đã thu hồi lời chúc trong Sheet.
 Không xóa dữ liệu Supabase cũ. Hai lời chúc công khai cũ đã được nhập sang Sheet với mã legacy-2 và legacy-3; đã kiểm tra hiển thị qua endpoint thật. Dữ liệu đăng ký cũ chỉ ở từng thiết bị, không thể tự lấy từ thiết bị khác.
@@ -26,3 +26,5 @@ Web app đã triển khai và URL /exec đã điền trong wish-config.js. Bản
 
 ## Giữ thông tin trên form
 Form tự lưu nháp trên trình duyệt hiện tại. Sau khi gửi, thông tin được giữ và có nút Chỉnh sửa thông tin. Thao tác save dùng cùng mã gửi và mã xác thực để cập nhật đúng một dòng, không tăng số lượt đăng ký. Xóa dữ liệu trình duyệt hoặc đổi thiết bị sẽ mất bản nháp và quyền chỉnh sửa tại máy đó. Bản trước nâng cấp chưa giữ mã sửa RSVP nên không thể tự nhận diện lượt cũ.
+
+Không đặt mức tối đa số người mỗi lượt; số người tham dự phải là số nguyên dương biểu diễn chính xác được trong JavaScript. Không cắt danh sách công khai ở 100 lời chúc; giao diện cuộn trong khung.
